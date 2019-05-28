@@ -1,0 +1,29 @@
+{
+  "name": "haproxy-sdk",
+  "version": "1.0.0",
+  "description": "Promise-based Javascript SDK for HAProxy management",
+  "main": "haproxy.js",
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackpinetech/haproxy-sdk.git"
+  },
+  "author": "Shaun Tarves <shaun.tarves@jackpinetech.com>",
+  "devDependencies": {
+    "prettier": "^1.17.1"
+  },
+  "keywords": [
+    "HAProxy",
+    "proxy",
+    "load balancer",
+    "orchestration",
+    "cloud",
+    "reverse",
+    "load",
+    "balancer"
+  ],
+  "engines": {
+    "node": ">=8.15.1",
+    "npm": ">=6.4.1"
+  }
+}
