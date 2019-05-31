@@ -193,7 +193,7 @@ class Server {
           )
         )
       )
-      .then(values => _Utils.checkCommandAddressPort("addr", values));
+      .then(values => _Utils.checkCommandAddressPort("port", values));
   }
 
   /**
