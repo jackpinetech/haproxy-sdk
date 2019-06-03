@@ -177,15 +177,16 @@ class Backend {
     if (!name) {
       throw "Name must be specified";
     }
-    return this.servers(name).then(servers => {
-      if (servers.length == 1) {
-        return servers[0];
-      } else if (servers.length == 0) {
-        throw "Could not find server";
-      } else {
-        throw "Found more than one server, this is a bug!";
-      }
-    });
+    return this.servers(name)
+      .then(servers => {
+        if (servers.length == 1) {
+          return servers[0];
+        } else if (servers.length == 0) {
+          throw "Could not find server";
+        } else {
+          throw "Found more than one server, this is a bug!";
+        }
+      });
   }
 
   /**
@@ -195,23 +196,20 @@ class Backend {
    * @returns {Promise<Server[]>} A list of {@link Server} objects
    */
   async servers(name) {
-    let servers_across_hap_processes = {};
-
-    let _servers = await Promise.all(
-      this._backend_per_proc.map(async _backend => {
-        let _servers = await _backend.servers(name);
-        _servers.forEach(_server => {
-          if (!servers_across_hap_processes.hasOwnProperty(_server.name)) {
-            servers_across_hap_processes[_server.name] = [];
-          }
-          servers_across_hap_processes[_server.name].push(_server);
+    return Promise.all(this._backend_per_proc.map(_backend => _backend.servers(name)))
+      .then(_servers_by_process => {
+        let servers_across_hap_processes = {};
+        _servers_by_process.forEach(_process => {
+          _process.forEach(_server => {
+            if (!servers_across_hap_processes.hasOwnProperty(_server.name)) {
+              servers_across_hap_processes[_server.name] = [];
+            }
+            servers_across_hap_processes[_server.name].push(_server);
+          });
         });
+        return servers_across_hap_processes;
       })
-    );
-
-    return Object.values(servers_across_hap_processes).map(
-      _server => new Server(_server, this.name)
-    );
+      .then(servers_across_hap_processes => Object.values(servers_across_hap_processes).map(_server => new Server(_server, this.name)));
   }
 }
 

@@ -387,7 +387,7 @@ class HAProxy {
             }
             frontends_across_hap_processes[
               _frontend.name
-            ] = frontends_across_hap_processes[_frontend.name].concat(
+              ] = frontends_across_hap_processes[_frontend.name].concat(
               _frontend
             );
           });
@@ -495,7 +495,6 @@ class HAProxy {
         true
       )
       .then(values => {
-        console.log(values);
         let get_info_proc1 = values[0][1];
         if (!_Utils.checkOutput(get_info_proc1)) {
           throw util.format("command failed %s", get_info_proc1[0]);
@@ -541,9 +540,11 @@ class HAProxy {
     if (!name) {
       throw "Hostname must be specified";
     }
-    return this.backends(backend).then(backends =>
-      Promise.all(backends.map(backend => backend.server(name)))
-    );
+    return this.backends(backend)
+      .then(backends => Promise.all(backends.map(backend => backend.server(name)
+        .catch(() => [])))
+      )
+      .then(result => [].concat.apply([], result));
   }
 
   /**
@@ -607,7 +608,7 @@ class HAProxy {
             }
             backends_across_hap_processes[
               _backend.name
-            ] = backends_across_hap_processes[_backend.name].concat(_backend);
+              ] = backends_across_hap_processes[_backend.name].concat(_backend);
           });
         return backends_across_hap_processes;
       })
