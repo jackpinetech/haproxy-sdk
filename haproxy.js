@@ -338,7 +338,7 @@ class HAProxy {
       .commandAcrossAllProcesses(
         this._hap_processes,
         "command",
-        util.format("clear table %s %s", table, key)
+        util.format("clear table %s key %s", table, key)
       )
       .then(values => _Utils.checkCommand(values));
   }

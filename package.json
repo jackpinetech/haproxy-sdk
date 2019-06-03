@@ -1,6 +1,6 @@
 {
   "name": "haproxy-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Promise-based Javascript SDK for HAProxy management",
   "main": "haproxy.js",
   "license": "(MIT OR Apache-2.0)",
