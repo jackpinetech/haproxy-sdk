@@ -224,7 +224,7 @@ class HAProxy {
    * @param {string} table table name.
    * @returns {Promise<boolean>} {true} if command succeeds otherwise {false}
    */
-  async cleaTable(table) {
+  async clearTable(table) {
     return _Utils
       .commandAcrossAllProcesses(
         this._hap_processes,
