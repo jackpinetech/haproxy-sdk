@@ -4,6 +4,9 @@
   "description": "Promise-based Javascript SDK for HAProxy management",
   "main": "haproxy.js",
   "license": "(MIT OR Apache-2.0)",
+  "publishConfig": {
+    "registry": "https://nexus.jackpinetech.com/repository/npm-internal/"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/jackpinetech/haproxy-sdk.git"
