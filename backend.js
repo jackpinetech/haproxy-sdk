@@ -1,5 +1,6 @@
 const Server = require("./server");
 const _Utils = require("./lib/_utils");
+const util = require("util");
 
 /**
  * This module provides the {@link Backend} class which allows to run operation for a backend.
@@ -50,7 +51,7 @@ class Backend {
       "ttime",
       "weight",
       "wredis",
-      "wretr"
+      "wretr",
     ];
   }
 
@@ -92,7 +93,7 @@ class Backend {
    */
   async processNumber() {
     return Promise.all(
-      this._backend_per_proc.map(_backend => _backend.processNumber())
+      this._backend_per_proc.map((_backend) => _backend.processNumber())
     );
   }
 
@@ -113,7 +114,7 @@ class Backend {
   async status() {
     return _Utils
       .commandAcrossAllProcesses(this._backend_per_proc, "metric", "status")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -131,13 +132,13 @@ class Backend {
       throw util.format("%s is not valid metric", name);
     }
     let metrics = await Promise.all(
-      this._backend_per_proc.map(async _hap_process =>
+      this._backend_per_proc.map(async (_hap_process) =>
         _hap_process.metric(name)
       )
     );
     return _Utils.calculate(
       name,
-      metrics.map(metric => _Utils.converter(metric)).filter(() => true)
+      metrics.map((metric) => _Utils.converter(metric)).filter(() => true)
     );
   }
 
@@ -177,16 +178,15 @@ class Backend {
     if (!name) {
       throw "Name must be specified";
     }
-    return this.servers(name)
-      .then(servers => {
-        if (servers.length == 1) {
-          return servers[0];
-        } else if (servers.length == 0) {
-          throw "Could not find server";
-        } else {
-          throw "Found more than one server, this is a bug!";
-        }
-      });
+    return this.servers(name).then((servers) => {
+      if (servers.length == 1) {
+        return servers[0];
+      } else if (servers.length == 0) {
+        throw "Could not find server";
+      } else {
+        throw "Found more than one server, this is a bug!";
+      }
+    });
   }
 
   /**
@@ -196,12 +196,19 @@ class Backend {
    * @returns {Promise<Server[]>} A list of {@link Server} objects
    */
   async servers(name) {
-    return Promise.all(this._backend_per_proc.map(_backend => _backend.servers(name)))
-      .then(_servers_by_process => {
+    return Promise.all(
+      this._backend_per_proc.map((_backend) => _backend.servers(name))
+    )
+      .then((_servers_by_process) => {
         let servers_across_hap_processes = {};
-        _servers_by_process.forEach(_process => {
-          _process.forEach(_server => {
-            if (!servers_across_hap_processes.hasOwnProperty(_server.name)) {
+        _servers_by_process.forEach((_process) => {
+          _process.forEach((_server) => {
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                servers_across_hap_processes,
+                _server.name
+              )
+            ) {
               servers_across_hap_processes[_server.name] = [];
             }
             servers_across_hap_processes[_server.name].push(_server);
@@ -209,7 +216,11 @@ class Backend {
         });
         return servers_across_hap_processes;
       })
-      .then(servers_across_hap_processes => Object.values(servers_across_hap_processes).map(_server => new Server(_server, this.name)));
+      .then((servers_across_hap_processes) =>
+        Object.values(servers_across_hap_processes).map(
+          (_server) => new Server(_server, this.name)
+        )
+      );
   }
 }
 

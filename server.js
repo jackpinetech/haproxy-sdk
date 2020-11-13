@@ -36,7 +36,7 @@ class Server {
       Server.STATE_DISABLE,
       Server.STATE_MAINT,
       Server.STATE_DRAIN,
-      Server.STATE_READY
+      Server.STATE_READY,
     ];
   }
 
@@ -80,7 +80,7 @@ class Server {
       "ttime",
       "weight",
       "wredis",
-      "wretr"
+      "wretr",
     ];
   }
 
@@ -125,7 +125,7 @@ class Server {
   async checkCode() {
     return _Utils
       .commandAcrossAllProcesses(this._server_per_proc, "metric", "check_code")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -140,7 +140,7 @@ class Server {
         "metric",
         "check_status"
       )
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -163,7 +163,7 @@ class Server {
       // per process and not the assigned port.
       // Since we want to report the port, we simply catch that case and
       // report the assigned port.
-      let portsAcrossProc = values.map(value => value.split(":")[1]);
+      let portsAcrossProc = values.map((value) => value.split(":")[1]);
       if (_Utils.elementsOfListSame(portsAcrossProc)) {
         return portsAcrossProc[0];
       } else {
@@ -180,7 +180,7 @@ class Server {
    */
   async setPort(port) {
     return this.address()
-      .then(address =>
+      .then((address) =>
         _Utils.commandAcrossAllProcesses(
           this._server_per_proc,
           "command",
@@ -193,7 +193,7 @@ class Server {
           )
         )
       )
-      .then(values => _Utils.checkCommandAddressPort("port", values));
+      .then((values) => _Utils.checkCommandAddressPort("port", values));
   }
 
   /**
@@ -216,7 +216,7 @@ class Server {
       // per process and not the assigned port.
       // Since we want to report the port, we simply catch that case and
       // report the assigned port.
-      let addressesAcrossProc = values.map(value => value.split(":")[0]);
+      let addressesAcrossProc = values.map((value) => value.split(":")[0]);
       if (_Utils.elementsOfListSame(addressesAcrossProc)) {
         return addressesAcrossProc[0];
       } else {
@@ -233,7 +233,7 @@ class Server {
    */
   async setAddress(address) {
     return this.port()
-      .then(port =>
+      .then((port) =>
         _Utils.commandAcrossAllProcesses(
           this._server_per_proc,
           "command",
@@ -246,7 +246,7 @@ class Server {
           )
         )
       )
-      .then(values => _Utils.checkCommandAddressPort("addr", values));
+      .then((values) => _Utils.checkCommandAddressPort("addr", values));
   }
 
   /**
@@ -257,7 +257,7 @@ class Server {
   async lastStatus() {
     return _Utils
       .commandAcrossAllProcesses(this._server_per_proc, "metric", "last_chk")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -268,7 +268,7 @@ class Server {
   async lastAgentCheck() {
     return _Utils
       .commandAcrossAllProcesses(this._server_per_proc, "metric", "last_agt")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -287,7 +287,7 @@ class Server {
    */
   async processNumber() {
     return Promise.all(
-      this._server_per_proc.map(_server => _server.processNumber())
+      this._server_per_proc.map((_server) => _server.processNumber())
     );
   }
 
@@ -324,7 +324,7 @@ class Server {
               this._name
             )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -344,7 +344,7 @@ class Server {
   async status() {
     return _Utils
       .commandAcrossAllProcesses(this._server_per_proc, "metric", "status")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -355,7 +355,7 @@ class Server {
   async weight() {
     return _Utils
       .commandAcrossAllProcesses(this._server_per_proc, "metric", "weight")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -389,7 +389,7 @@ class Server {
             weight
           )
         )
-        .then(values => _Utils.checkCommand(values));
+        .then((values) => _Utils.checkCommand(values));
     }
     throw msg;
   }
@@ -410,7 +410,7 @@ class Server {
           this._name
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -428,11 +428,11 @@ class Server {
       throw Error(util.format("%s is not valid metric", name));
     }
     let metrics = await Promise.all(
-      this._server_per_proc.map(async _server => _server.metric(name))
+      this._server_per_proc.map(async (_server) => _server.metric(name))
     );
     return _Utils.calculate(
       name,
-      metrics.map(metric => _Utils.converter(metric)).filter(() => true)
+      metrics.map((metric) => _Utils.converter(metric)).filter(() => true)
     );
   }
 

@@ -36,7 +36,7 @@ class Frontend {
       "scur",
       "slim",
       "smax",
-      "stot"
+      "stot",
     ];
   }
 
@@ -74,7 +74,7 @@ class Frontend {
         "command",
         util.format("disable frontend %s", this._name)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -89,7 +89,7 @@ class Frontend {
         "command",
         util.format("enable frontend %s", this._name)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -121,7 +121,7 @@ class Frontend {
         "command",
         util.format("set maxconn frontend %s %s", this._name, value)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -140,7 +140,7 @@ class Frontend {
    */
   async processNumber() {
     return Promise.all(
-      this._frontend_per_proc.map(_frontend => _frontend.processNumber())
+      this._frontend_per_proc.map((_frontend) => _frontend.processNumber())
     );
   }
 
@@ -168,11 +168,11 @@ class Frontend {
       throw util.format("%s is not valid metric", name);
     }
     return Promise.all(
-      this._frontend_per_proc.map(_hap_process => _hap_process.metric(name))
-    ).then(metrics =>
+      this._frontend_per_proc.map((_hap_process) => _hap_process.metric(name))
+    ).then((metrics) =>
       _Utils.calculate(
         name,
-        metrics.map(metric => _Utils.converter(metric)).filter(() => true)
+        metrics.map((metric) => _Utils.converter(metric)).filter(() => true)
       )
     );
   }
@@ -207,7 +207,7 @@ class Frontend {
         "command",
         util.format("shutdown frontend %s", this._name)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -229,7 +229,7 @@ class Frontend {
   async status() {
     return _Utils
       .commandAcrossAllProcesses(this._frontend_per_proc, "metric", "status")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 }
 

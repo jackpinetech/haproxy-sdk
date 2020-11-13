@@ -1,19 +1,21 @@
 {
-  "name": "haproxy-sdk",
-  "version": "1.0.4",
+  "author": {
+    "name": "Shaun Tarves",
+    "email": "shaun.tarves@jackpinetech.com"
+  },
+  "bugs": {
+    "url": "https://github.com/jackpinetech/haproxy-sdk/issues"
+  },
   "description": "Promise-based Javascript SDK for HAProxy management",
-  "main": "haproxy.js",
-  "license": "(MIT OR Apache-2.0)",
-  "publishConfig": {
-    "registry": "https://nexus.jackpinetech.com/repository/npm-internal/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jackpinetech/haproxy-sdk.git"
-  },
-  "author": "Shaun Tarves <shaun.tarves@jackpinetech.com>",
   "devDependencies": {
-    "prettier": "^1.17.1"
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": ">=8.15.1",
+    "npm": ">=6.4.1"
   },
   "keywords": [
     "HAProxy",
@@ -25,8 +27,16 @@
     "load",
     "balancer"
   ],
-  "engines": {
-    "node": ">=8.15.1",
-    "npm": ">=6.4.1"
-  }
+  "license": "(MIT OR Apache-2.0)",
+  "main": "haproxy.js",
+  "name": "haproxy-sdk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackpinetech/haproxy-sdk.git"
+  },
+  "scripts": {
+    "lint": "eslint *.js lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.4"
 }

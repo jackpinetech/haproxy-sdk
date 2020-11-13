@@ -63,7 +63,7 @@ class HAProxy {
       "CompressBpsOut",
       "Maxsock",
       "MaxSslRate",
-      "MaxSessRate"
+      "MaxSessRate",
     ];
   }
   static get SERVER_METRICS() {
@@ -120,12 +120,12 @@ class HAProxy {
       throw util.format("socket path does not exist %s", socket);
     }
     if (fs.lstatSync(socket).isDirectory()) {
-      fs.readdirSync(path.join(socket, "*")).forEach(_file => {
-        if (_Utils.isUnixSocket(_file) && _Utils.connectedSocket(_file)) {
+      fs.readdirSync(path.join(socket, "*")).forEach((_file) => {
+        if (_Utils.isUnixSocket(_file) && _Utils.connectedSocket()) {
           socket_files.push(_file);
         }
       });
-    } else if (_Utils.isUnixSocket(socket) && _Utils.connectedSocket(socket)) {
+    } else if (_Utils.isUnixSocket(socket) && _Utils.connectedSocket()) {
       socket_files.push(path.normalize(socket));
     } else {
       throw "UNIX socket file was not set";
@@ -135,7 +135,7 @@ class HAProxy {
       throw util.format("No valid UNIX socket file was found at %s", socket);
     }
 
-    socket_files.forEach(so_file =>
+    socket_files.forEach((so_file) =>
       this._hap_processes.push(
         new _HAProxyProcess(so_file, retry, retry_interval, timeout)
       )
@@ -160,7 +160,7 @@ class HAProxy {
           pattern
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -183,7 +183,7 @@ class HAProxy {
           value
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -199,7 +199,7 @@ class HAProxy {
         "command",
         util.format("clear acl %s", _Utils.isInt(acl) ? "#" + acl : acl)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -215,7 +215,7 @@ class HAProxy {
         "command",
         util.format("clear map %s", _Utils.isInt(map) ? "#" + map : map)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -231,7 +231,7 @@ class HAProxy {
         "command",
         util.format("clear table %s", table || "")
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -251,7 +251,7 @@ class HAProxy {
         "command",
         util.format("clear counters %s", all ? "all" : "")
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -274,7 +274,9 @@ class HAProxy {
    */
   async processIds() {
     return Promise.all(
-      this._hap_processes.map(async _hap_process => _hap_process.metric("Pid"))
+      this._hap_processes.map(async (_hap_process) =>
+        _hap_process.metric("Pid")
+      )
     );
   }
 
@@ -296,7 +298,7 @@ class HAProxy {
           key.startsWith("0x") ? "#" + key : key
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -317,7 +319,7 @@ class HAProxy {
           key.startsWith("0x") ? "#" + key : key
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -340,7 +342,7 @@ class HAProxy {
         "command",
         util.format("clear table %s key %s", table, key)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -369,33 +371,36 @@ class HAProxy {
    */
   async frontends(name) {
     return Promise.all(
-      this._hap_processes.map(_hap_process => _hap_process.frontends(name))
+      this._hap_processes.map((_hap_process) => _hap_process.frontends(name))
     )
-      .then(_hap_processes_frontends => {
+      .then((_hap_processes_frontends) => {
         let frontends_across_hap_processes = {};
         []
           .concat(
-            ..._hap_processes_frontends.map(_hap_process_frontends =>
+            ..._hap_processes_frontends.map((_hap_process_frontends) =>
               [].concat(..._hap_process_frontends)
             )
           )
-          .forEach(_frontend => {
+          .forEach((_frontend) => {
             if (
-              !frontends_across_hap_processes.hasOwnProperty(_frontend.name)
+              !Object.prototype.hasOwnProperty.call(
+                frontends_across_hap_processes,
+                _frontend.name
+              )
             ) {
               frontends_across_hap_processes[_frontend.name] = [];
             }
             frontends_across_hap_processes[
               _frontend.name
-              ] = frontends_across_hap_processes[_frontend.name].concat(
+            ] = frontends_across_hap_processes[_frontend.name].concat(
               _frontend
             );
           });
         return frontends_across_hap_processes;
       })
-      .then(frontends_across_hap_processes =>
+      .then((frontends_across_hap_processes) =>
         Object.keys(frontends_across_hap_processes).map(
-          key => new Frontend(frontends_across_hap_processes[key])
+          (key) => new Frontend(frontends_across_hap_processes[key])
         )
       );
   }
@@ -410,7 +415,7 @@ class HAProxy {
     if (!name) {
       throw "Name must be specified";
     }
-    return this.frontends(name).then(frontends => {
+    return this.frontends(name).then((frontends) => {
       if (frontends.length == 1) {
         return frontends[0];
       } else if (frontends.length == 0) {
@@ -436,7 +441,7 @@ class HAProxy {
         util.format("get acl %s %s", _Utils.isInt(acl) ? "#" + acl : acl, key),
         true
       )
-      .then(values => {
+      .then((values) => {
         let get_info_proc1 = values[0][1];
         if (!_Utils.checkOutput(get_info_proc1)) {
           throw util.format("value error %s", get_info_proc1);
@@ -464,7 +469,7 @@ class HAProxy {
         ),
         true
       )
-      .then(values => {
+      .then((values) => {
         let get_info_proc1 = values[0][1];
         if (!_Utils.checkOutput(get_info_proc1)) {
           throw util.format("command failed %s", get_info_proc1[0]);
@@ -494,7 +499,7 @@ class HAProxy {
         util.format("show table %s key %s", table, key),
         true
       )
-      .then(values => {
+      .then((values) => {
         let get_info_proc1 = values[0][1];
         if (!_Utils.checkOutput(get_info_proc1)) {
           throw util.format("command failed %s", get_info_proc1[0]);
@@ -511,7 +516,7 @@ class HAProxy {
    */
   async info() {
     return Promise.all(
-      this._hap_processes.map(_hap_process => _hap_process.processInfo())
+      this._hap_processes.map((_hap_process) => _hap_process.processInfo())
     );
   }
 
@@ -541,10 +546,12 @@ class HAProxy {
       throw "Hostname must be specified";
     }
     return this.backends(backend)
-      .then(backends => Promise.all(backends.map(backend => backend.server(name)
-        .catch(() => [])))
+      .then((backends) =>
+        Promise.all(
+          backends.map((backend) => backend.server(name).catch(() => []))
+        )
       )
-      .then(result => [].concat.apply([], result));
+      .then((result) => [].concat.apply([], result));
   }
 
   /**
@@ -557,8 +564,10 @@ class HAProxy {
    */
   async servers(backend) {
     return this.backends(backend)
-      .then(backends => Promise.all(backends.map(backend => backend.servers())))
-      .then(result => [].concat.apply([], result));
+      .then((backends) =>
+        Promise.all(backends.map((backend) => backend.servers()))
+      )
+      .then((result) => [].concat.apply([], result));
   }
 
   /**
@@ -576,11 +585,11 @@ class HAProxy {
       throw util.format("%s is not valid metric", name);
     }
     let metrics = await Promise.all(
-      this._hap_processes.map(async _hap_process => _hap_process.metric(name))
+      this._hap_processes.map(async (_hap_process) => _hap_process.metric(name))
     );
     return _Utils.calculate(
       name,
-      metrics.map(metric => _Utils.converter(metric)).filter(() => true)
+      metrics.map((metric) => _Utils.converter(metric)).filter(() => true)
     );
   }
 
@@ -592,29 +601,34 @@ class HAProxy {
    */
   async backends(name) {
     return Promise.all(
-      this._hap_processes.map(_hap_process => _hap_process.backends(name))
+      this._hap_processes.map((_hap_process) => _hap_process.backends(name))
     )
-      .then(_hap_processes_backends => {
+      .then((_hap_processes_backends) => {
         let backends_across_hap_processes = {};
         []
           .concat(
-            ..._hap_processes_backends.map(_hap_process_backends =>
+            ..._hap_processes_backends.map((_hap_process_backends) =>
               [].concat(..._hap_process_backends)
             )
           )
-          .forEach(_backend => {
-            if (!backends_across_hap_processes.hasOwnProperty(_backend.name)) {
+          .forEach((_backend) => {
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                backends_across_hap_processes,
+                _backend.name
+              )
+            ) {
               backends_across_hap_processes[_backend.name] = [];
             }
             backends_across_hap_processes[
               _backend.name
-              ] = backends_across_hap_processes[_backend.name].concat(_backend);
+            ] = backends_across_hap_processes[_backend.name].concat(_backend);
           });
         return backends_across_hap_processes;
       })
-      .then(backends_across_hap_processes =>
+      .then((backends_across_hap_processes) =>
         Object.keys(backends_across_hap_processes).map(
-          key => new Backend(backends_across_hap_processes[key])
+          (key) => new Backend(backends_across_hap_processes[key])
         )
       );
   }
@@ -629,7 +643,7 @@ class HAProxy {
     if (!name) {
       throw "Name must be specified";
     }
-    return this.backends(name).then(backends => {
+    return this.backends(name).then((backends) => {
       if (backends.length == 1) {
         return backends[0];
       } else if (backends.length == 0) {
@@ -674,10 +688,10 @@ class HAProxy {
    */
   async requests() {
     return this.frontends()
-      .then(frontends =>
-        Promise.all(frontends.map(frontend => frontend.requests()))
+      .then((frontends) =>
+        Promise.all(frontends.map((frontend) => frontend.requests()))
       )
-      .then(requests => requests.reduce((a, b) => a + b, 0));
+      .then((requests) => requests.reduce((a, b) => a + b, 0));
   }
 
   /**
@@ -700,7 +714,7 @@ class HAProxy {
           value
         )
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -724,7 +738,7 @@ class HAProxy {
         "command",
         util.format("set table %s key %s %s", table, key, value || "")
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -762,7 +776,7 @@ class HAProxy {
         "command",
         util.format("set maxconn global %s", value)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -780,7 +794,7 @@ class HAProxy {
         "command",
         util.format("set rate-limit connections global %s", value)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -798,7 +812,7 @@ class HAProxy {
         "command",
         util.format("set rate-limit sessions global %s", value)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -816,7 +830,7 @@ class HAProxy {
         "command",
         util.format("set rate-limit ssl-sessions global %s", value)
       )
-      .then(values => _Utils.checkCommand(values));
+      .then((values) => _Utils.checkCommand(values));
   }
 
   /**
@@ -839,7 +853,7 @@ class HAProxy {
         ),
         true
       )
-      .then(values => {
+      .then((values) => {
         // ACL can't be different per process thus we only return the acl
         // content found in 1st process.
         let acl_info_proc1 = values[0][1];
@@ -874,7 +888,7 @@ class HAProxy {
         ),
         true
       )
-      .then(values => {
+      .then((values) => {
         // map can't be different per process thus we only return the map
         // content found in 1st process.
         let map_info_proc1 = values[0][1];
@@ -906,7 +920,7 @@ class HAProxy {
         util.format("show table %s", table || ""),
         true
       )
-      .then(values => {
+      .then((values) => {
         // tables can't be different per process thus we only return the table
         // content found in 1st process.
         let table_info_proc1 = values[0][1];
@@ -928,7 +942,7 @@ class HAProxy {
   async uptime() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "Uptime")
-      .then(values => values[0][1]);
+      .then((values) => values[0][1]);
   }
 
   /**
@@ -939,7 +953,7 @@ class HAProxy {
   async description() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "description")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -950,7 +964,7 @@ class HAProxy {
   async nodeName() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "node")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -961,7 +975,7 @@ class HAProxy {
   async uptimeSec() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "Uptime_sec")
-      .then(values => values[0][1]);
+      .then((values) => values[0][1]);
   }
 
   /**
@@ -972,7 +986,7 @@ class HAProxy {
   async releaseDate() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "Release_date")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 
   /**
@@ -983,7 +997,7 @@ class HAProxy {
   async version() {
     return _Utils
       .commandAcrossAllProcesses(this._hap_processes, "metric", "Version")
-      .then(values => _Utils.compareValues(values));
+      .then((values) => _Utils.compareValues(values));
   }
 }
 

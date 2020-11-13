@@ -97,7 +97,7 @@ class CommandStatus {
       "Value out of range.",
       "Missing resolver section identifier.",
       "Can't find resolvers section.",
-      "Can't find backend."
+      "Can't find backend.",
     ];
   }
 
